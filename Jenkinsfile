@@ -1,47 +1,49 @@
-pipeline {
-    agent any
+pipeline{
+    agent{
+        label 'velakaran'
+    }
+
     tools {
-        maven 'Maven363'
+        maven 'maven_3.9.0'
     }
-    options {
-        timeout(10)
-        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '5', numToKeepStr: '5')
-    }
-    stages {
-        stage('Build') {
-            steps {
-                sh "mvn clean install"
+
+    stages{
+        stage('SCM Checkout'){
+            steps{
+                checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/DevOps-SVC04/java-maven-war-app.git']])
+            }
+
+        }
+
+        stage('Maven-Build'){
+            steps{
+                sh 'mvn clean install'
             }
         }
-        stage('upload artifact to nexus') {
-            steps {
-                nexusArtifactUploader artifacts: [
-                    [
-                        artifactId: 'wwp', 
-                        classifier: '', 
-                        file: 'target/wwp-1.0.0.war', 
-                        type: 'war'
-                    ]
-                ], 
-                    credentialsId: 'nexus3', 
-                    groupId: 'koddas.web.war', 
-                    nexusUrl: '10.0.0.91:8081', 
-                    nexusVersion: 'nexus3', 
-                    protocol: 'http', 
-                    repository: 'samplerepo', 
-                    version: '1.0.0'
-            }
-        }
-    }
-    post {
-        always{
-            deleteDir()
-        }
-        failure {
-            echo "sendmail -s mvn build failed receipients@my.com"
-        }
-        success {
-            echo "The job is successful"
-        }
+
+        // stage('Sonar Scan'){
+        //     steps{
+        //         withSonarQubeEnv("SonarQube") {
+        //             sh "${tool("Sonar_4.8")}/bin/sonar-scanner \
+        //             -Dsonar.host.url=http://ec2-13-232-201-247.ap-south-1.compute.amazonaws.com:9000/ \
+        //             -Dsonar.login=sqp_0c07fd0d029a2928a7f9a656ce9486e029a7affa \
+        //             -Dsonar.java.binaries=target \
+        //             -Dsonar.projectKey=java-maven-app"
+        //         }
+        //     }
+        // }
+
+        // stage('Nexus Upload'){
+        //     steps{
+        //         sh 'mvn -s settings.xml clean deploy'
+        //     }
+        // }
+
+        // stage('deployment'){
+        //     steps{
+        //         sh 'ansible-playbook -i inventory deployment_playbook.yml -e "build_number=${BUILD_NUMBER}"'
+        //     }
+        // }
+
     }
 }
