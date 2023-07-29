@@ -6,7 +6,7 @@
 	<link href="static/style.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-	<h1>Hello Hariharan and Muiz</h1>
+	<h1>Hello Hari Harry and Muiz</h1>
 	
 </body>
 </html>
