@@ -1,38 +1,27 @@
-# Maven
-# Build your Java project and run tests with Apache Maven.
-# Add steps that analyze code, save build artifacts, deploy, and more:
-# https://docs.microsoft.com/azure/devops/pipelines/languages/java
+---
+- name: deployment
+  hosts: all
+  become: true
+  vars:
+    nexus_url: http://ec2-65-0-123-219.ap-south-1.compute.amazonaws.com:8081/repository
+    repository_type: java-maven-app-release
+    group_id: com%2Fmycompany%2Fapp
+    artifact_id: hello-world-war
+    version: 1.0.0
+    build_number: "{{build_number}}"
+  tasks:
+  - name: Download file from a file path
+    ansible.builtin.get_url:
+      url: "{{nexus_url}}/{{repository_type}}/{{group_id}}%2F{{artifact_id}}%2F{{version}}-{{build_number}}%2F{{artifact_id}}-{{version}}-{{ build_number}}.war"
+      dest: /home/ec2-user
+      username: admin
+      password: admin
 
-trigger:
-- master
+  - name: Rename war file
+    ansible.builtin.shell: mv /home/ec2-user/{{group_id}}%2F{{artifact_id}}%2F{{version}}-{{build_number}}%2F{{artifact_id}}-{{version}}-{{ build_number}}.war /home/ec2-user/faangler.war
 
-pool:
-  vmImage: ubuntu-latest
+  - name: Deploying artifact in webapps
+    ansible.builtin.shell: cp /home/ec2-user/faangler.war /home/ec2-user/apache-tomcat-9.0.75/webapps/faangler.war
 
-steps:
-
-- task: Bash@3
-  displayName: 'Workaround: Set environment variables manually'
-  inputs:
-    targetType: 'inline'
-    script: |
-      echo "##vso[task.setvariable variable=JAVA_HOME]$(JAVA_HOME_11_X64)"
-      echo "##vso[task.setvariable variable=PATH]$(JAVA_HOME_11_X64)/bin:$(PATH)"
-  
-
-- task: Maven@3
-  inputs:
-    mavenPomFile: 'pom.xml'
-    mavenOptions: '-Xmx3072m'
-    javaHomeOption: 'JDKVersion'
-    jdkVersionOption: '1.8'
-    jdkArchitectureOption: 'x64'
-    publishJUnitResults: true
-    testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    goals: 'package'
-
-- task: Docker@2
-  inputs:
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
-
+  - name: remove the artifact
+    ansible.builtin.shell: rm -rf /home/ec2-user/faangler.war
