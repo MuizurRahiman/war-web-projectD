@@ -7,6 +7,8 @@ pipeline{
         maven 'maven_3.9.0'
     }
 
+    cleanWs()
+    
     stages{
         stage('SCM Checkout'){
             steps{
