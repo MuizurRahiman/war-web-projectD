@@ -6,10 +6,13 @@ pipeline{
     tools {
         maven 'maven_3.9.0'
     }
-
-    cleanWs()
     
     stages{
+        stage('CleanWorkspace') {
+            steps {
+                cleanWs()
+            }
+            
         stage('SCM Checkout'){
             steps{
                 checkout scmGit(branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/pikaz01/war-web-projectD.git']])
