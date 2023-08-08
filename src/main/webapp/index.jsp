@@ -7,7 +7,7 @@
 </head>
 <body>
 	<h1>Welcome guy's</h1>
-	<h1>Hello Hari Harry and Muiz</h1>
+	<h1>Pikaz Completed CI- CD using Jenkins, UCD, and tomcat</h1>
 	
 </body>
 </html>
