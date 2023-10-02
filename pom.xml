@@ -6,6 +6,11 @@
   <packaging>war</packaging>
   <name>WAR Web Project</name>
   <description>A very simple Maven-enabled WAR web project</description>
+  <properties>
+    <java.version>16</java.version>
+    <maven.compiler.target>${java.version}</maven.compiler.target>
+    <maven.compiler.source>${java.version}</maven.compiler.source>
+</properties>
   <dependencies>
   	<dependency>
   		<groupId>com.google.code.gson</groupId>
